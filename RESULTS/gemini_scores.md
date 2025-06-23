@@ -43,3 +43,64 @@
 
 **Overall Summary & Analysis:**
 *   [User to provide a brief overall summary of the model's performance across all tests.]
+
+---
+---
+
+# Gemini Model Benchmark Scores
+
+**Model Name:** gemini-1.5-flash-latest
+**Date of Test:** [User to fill in Date]
+
+---
+
+## CLOCK Test
+
+**Score:** Issue / [Total Possible Score]
+
+**How scores were derived:**
+*   [User to explain how scores were derived based on CLOCK/scoring.md]
+
+**Observations/Notes:**
+*   Issues encountered during testing.
+
+---
+
+## ENIGMA Test
+
+**Score:** Issue / [Total Possible Score]
+
+**How scores were derived:**
+*   [User to explain how scores were derived based on ENIGMA/scoring.md]
+
+**Observations/Notes:**
+*   Issues encountered during testing.
+
+---
+
+## VISUAL Test
+
+**Score:** 1 / [Total Possible Score]
+
+**How scores were derived:**
+*   [User to explain how scores were derived based on VISUAL/scoring.md]
+
+**Observations/Notes:**
+*   [User to detail any specific observations or model outputs]
+
+---
+
+## LIPOGRAM Test
+
+**Score:** 54 / [Total Possible Score]
+
+**How scores were derived:**
+*   [User to explain how scores were derived based on LIPOGRAM/scoring.md]
+
+**Observations/Notes:**
+*   [User to detail any specific observations or model outputs]
+
+---
+
+**Overall Summary & Analysis:**
+*   [User to provide a brief overall summary of the model's performance across all tests.]
