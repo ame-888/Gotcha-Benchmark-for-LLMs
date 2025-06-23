@@ -50,9 +50,16 @@ def parse_md_file(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             lines = f.readlines()
-        print(f"DEBUG parse_md_file: Read {len(lines)} lines. First 5 lines raw:")
-        for i in range(min(5, len(lines))):
-            print(f"DEBUG parse_md_file: Line {i}: {lines[i].strip()[:150]}")
+        print(f"DEBUG parse_md_file: Read {len(lines)} lines.")
+        if len(lines) < 20: # If file is short (like ENIGMA/prompts.md should be if empty or with few prompts)
+            print(f"DEBUG parse_md_file: --- Entire content of {os.path.basename(file_path)} ---")
+            for i, line_content in enumerate(lines):
+                print(f"DEBUG parse_md_file: Raw Line {i}: {line_content.rstrip()}")
+            print(f"DEBUG parse_md_file: --- End of content ---")
+        else: # If file is longer, just print first 5
+            print(f"DEBUG parse_md_file: First 5 lines raw:")
+            for i in range(min(5, len(lines))):
+                print(f"DEBUG parse_md_file: Line {i}: {lines[i].strip()[:150]}")
     except Exception as e:
         print(f"DEBUG parse_md_file: Error reading file {file_path}: {e}")
         return []
