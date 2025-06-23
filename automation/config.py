@@ -7,3 +7,5 @@
 
 API_KEY = "YOUR_GEMINI_API_KEY_HERE"
 IMAGE_API_KEY = "YOUR_IMAGE_API_KEY_HERE" # Placeholder for image generation model
+
+SECONDS_BETWEEN_API_CALLS = 1
