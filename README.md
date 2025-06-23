@@ -18,6 +18,8 @@ This project is divided into three distinct tests:
 
 3.  **[VISUAL (Deceptive Images)](./VISUAL/prompts.md):** Evaluates the model's ability to analyze an image for what it actually contains, rather than defaulting to a "known" answer about a similar-looking optical illusion or concept. This tests a model's ability to prioritize direct perception over learned patterns. See the [scoring criteria here](./VISUAL/scoring.md).
 
+4.  **[LIPOGRAM](./LIPOGRAM/prompts.md):** Evaluates the model's creative ability and cognitive control by challenging it to write a lengthy text without using a specific letter. See the [scoring criteria here](./LIPOGRAM/scoring.md).
+
 ## How to Use This Benchmark
 
 1.  **Select a model** you wish to test.
