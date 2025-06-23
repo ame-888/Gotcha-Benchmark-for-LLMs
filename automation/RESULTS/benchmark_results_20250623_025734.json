@@ -1,0 +1,15 @@
+{
+    "benchmark_run_date": "2025-06-23T02:57:34.155247",
+    "enigma_results": {},
+    "visual_results": {
+        "Quantos dedos tem nessa mão? [polydactyly_hand.png]": "ERROR: \n  No API_KEY or ADC found. Please either:\n    - Set the `GOOGLE_API_KEY` environment variable.\n    - Manually pass the key with `genai.configure(api_key=my_api_key)`.\n    - Or set up Application Default Credentials, see https://ai.google.dev/gemini-api/docs/oauth for more information.",
+        "Qual é a mais longa? [modified_muller_lyer.png]": "ERROR: \n  No API_KEY or ADC found. Please either:\n    - Set the `GOOGLE_API_KEY` environment variable.\n    - Manually pass the key with `genai.configure(api_key=my_api_key)`.\n    - Or set up Application Default Credentials, see https://ai.google.dev/gemini-api/docs/oauth for more information.",
+        "Qual quadrado é mais escuro, A ou B? [modified_checker_shadow.png]": "ERROR: \n  No API_KEY or ADC found. Please either:\n    - Set the `GOOGLE_API_KEY` environment variable.\n    - Manually pass the key with `genai.configure(api_key=my_api_key)`.\n    - Or set up Application Default Credentials, see https://ai.google.dev/gemini-api/docs/oauth for more information.",
+        "Qual círculo laranja é maior? [modified_ebbinghaus.png]": "ERROR: \n  No API_KEY or ADC found. Please either:\n    - Set the `GOOGLE_API_KEY` environment variable.\n    - Manually pass the key with `genai.configure(api_key=my_api_key)`.\n    - Or set up Application Default Credentials, see https://ai.google.dev/gemini-api/docs/oauth for more information."
+    },
+    "clock_results": {
+        "1. A realistic image of a cat wearing a small, knitted blue hat, sitting on a wooden table.": "Placeholder image saved to: /app/automation/RESULTS/CLOCK_IMAGES/001_a_realistic_image_of_a_cat_wearing_a_small_knitted_20250623025734.png",
+        "2. A surreal painting of a melting clock draped over a tree branch in a desert landscape, in the style of Salvador Dali.": "Placeholder image saved to: /app/automation/RESULTS/CLOCK_IMAGES/002_a_surreal_painting_of_a_melting_clock_draped_over__20250623025734.png",
+        "3. A child's drawing of a smiling sun with sunglasses, a red rocket ship flying towards it, and three green stars.": "Placeholder image saved to: /app/automation/RESULTS/CLOCK_IMAGES/003_a_childs_drawing_of_a_smiling_sun_with_sunglasses__20250623025734.png"
+    }
+}

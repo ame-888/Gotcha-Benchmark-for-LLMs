@@ -33,7 +33,10 @@ This project is divided into three distinct tests:
 
 ## Automated Benchmark Script
 
-This repository includes a Python script to automate the process of running the ENIGMA and VISUAL benchmarks using the Google Gemini API.
+This repository includes a Python script to automate the process of running the ENIGMA, VISUAL, and CLOCK benchmarks.
+
+*   For ENIGMA and VISUAL benchmarks, it uses the Google Gemini API.
+*   For the CLOCK benchmark (image generation), it currently generates **placeholder images**. You will need to modify the script (`automation/run_benchmark.py`) to integrate a real image generation API (e.g., DALL-E, Imagen). Instructions and placeholders for API keys are in `automation/config.py` and comments within `automation/run_benchmark.py`.
 
 ### Setup
 
@@ -50,8 +53,10 @@ This repository includes a Python script to automate the process of running the 
     pip install -r requirements.txt
     ```
 
-3.  **Configure API Key:**
-    Edit the `automation/config.py` file and replace `"YOUR_GEMINI_API_KEY_HERE"` with your actual Google Gemini API key.
+3.  **Configure API Key(s):**
+    *   Edit the `automation/config.py` file.
+    *   Replace `"YOUR_GEMINI_API_KEY_HERE"` with your actual Google Gemini API key for the ENIGMA and VISUAL benchmarks.
+    *   For the CLOCK benchmark, replace `"YOUR_IMAGE_API_KEY_HERE"` with your image generation model's API key if you intend to implement a live API call. If left as is, the script will generate placeholder images.
 
 ### Running the Benchmark
 
@@ -59,5 +64,9 @@ Once set up, run the script from within the `automation` directory:
 ```bash
 python run_benchmark.py
 ```
-The script will execute the benchmarks and save the results in a timestamped JSON file inside the `automation/RESULTS` folder. The CLOCK benchmark is not implemented as it requires a separate image generation API. You can then use the output file to manually score the model's performance based on the project's criteria.
+The script will execute all three benchmarks:
+*   ENIGMA and VISUAL results (text-based) will be saved in a timestamped JSON file inside the `automation/RESULTS` folder.
+*   CLOCK benchmark results (placeholder images) will be saved in the `automation/RESULTS/CLOCK_IMAGES/` directory. The JSON results file will contain paths to these images.
+
+You can then use the output file and images to manually score the model's performance based on the project's criteria.
 ---
