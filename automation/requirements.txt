@@ -1,0 +1,4 @@
+# automation/requirements.txt
+
+google-generativeai
+Pillow
