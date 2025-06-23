@@ -1,6 +1,6 @@
 # Gotcha-Benchmark-for-LLMs
 
-A benchmark for testing LLM reasoning in image generation (CLOCK), lateral thinking (ENIGMA), and visual analysis (VISUAL).
+A benchmark for testing LLM reasoning in image generation (CLOCK), lateral thinking (ENIGMA), restricted text generation (LIPOGRAM) and visual analysis (VISUAL).
 
 ## Our Philosophy: Benchmark by Template
 
