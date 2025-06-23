@@ -87,9 +87,9 @@ def run_visual_benchmark(model):
             results[f"{data['prompt']} [{os.path.basename(data['image_path'])}]"] = f"ERROR: {e}"
     return results
 
-def run_relogio_benchmark():
-    """Placeholder for the RELÓGIO (image generation) benchmark."""
-    print("\n--- Running RELÓGIO Benchmark ---")
+def run_clock_benchmark():
+    """Placeholder for the CLOCK (image generation) benchmark."""
+    print("\n--- Running CLOCK Benchmark ---")
     # This requires an image generation model and a different API (e.g., Imagen).
     # This is a placeholder to show where the logic would go.
     print("  SKIPPED: Image generation model API not implemented.")
@@ -112,14 +112,14 @@ if __name__ == "__main__":
     # Run benchmarks
     enigma_results = run_enigma_benchmark(text_model)
     visual_results = run_visual_benchmark(vision_model)
-    relogio_results = run_relogio_benchmark()
+    clock_results = run_clock_benchmark()
 
     # Collate results
     all_results = {
         "benchmark_run_date": datetime.now().isoformat(),
         "enigma_results": enigma_results,
         "visual_results": visual_results,
-        "relogio_results": relogio_results
+        "clock_results": clock_results
     }
 
     # Save results to a timestamped JSON file
