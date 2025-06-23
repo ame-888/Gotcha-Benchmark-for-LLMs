@@ -10,7 +10,7 @@ For a detailed explanation of this approach and the principles behind each test 
 
 ## The Benchmarks
 
-This project is divided into three distinct tests:
+This project is divided into four distinct tests:
 
 1.  **[CLOCK (Clock)](./CLOCK/prompts.md):** Evaluates the model's ability to generate spatially and logically accurate analog clock faces from precise time prompts. See the [scoring criteria here](./CLOCK/scoring.md).
 
@@ -23,7 +23,7 @@ This project is divided into three distinct tests:
 ## How to Use This Benchmark
 
 1.  **Select a model** you wish to test.
-2.  **Run the prompts** from each of the three benchmark sections (`CLOCK`, `ENIGMA`, `VISUAL`).
+2.  **Run the prompts** from each of the four benchmark sections (`CLOCK`, `ENIGMA`, `VISUAL`, `LIPOGRAM`).
 3.  **Score the results** honestly based on the provided scoring criteria for each section.
 4.  **Share your findings!** You can submit your results by creating an "Issue" or a "Pull Request" with a new results file in the `/RESULTS` directory.
 
@@ -37,7 +37,7 @@ For a comprehensive overview of model performances, please see the [**Leaderboar
 
 ## Automated Benchmark Script
 
-This repository includes a Python script to automate the process of running the ENIGMA, VISUAL, and CLOCK benchmarks.
+This repository includes a Python script to automate the process of running three of the four benchmarks: ENIGMA, VISUAL, and CLOCK. The LIPOGRAM benchmark is currently performed manually.
 
 *   For ENIGMA and VISUAL benchmarks, it uses the Google Gemini API.
 *   For the CLOCK benchmark (image generation), it currently generates **placeholder images**. You will need to modify the script (`automation/run_benchmark.py`) to integrate a real image generation API (e.g., DALL-E, Imagen). Instructions and placeholders for API keys are in `automation/config.py` and comments within `automation/run_benchmark.py`.
@@ -68,7 +68,7 @@ Once set up, run the script from within the `automation` directory:
 ```bash
 python run_benchmark.py
 ```
-The script will execute all three benchmarks:
+The script will execute the automated benchmarks (ENIGMA, VISUAL, and CLOCK):
 *   ENIGMA and VISUAL results (text-based) will be saved in a timestamped JSON file inside the `automation/RESULTS` folder.
 *   CLOCK benchmark results (placeholder images) will be saved in the `automation/RESULTS/CLOCK_IMAGES/` directory. The JSON results file will contain paths to these images.
 
