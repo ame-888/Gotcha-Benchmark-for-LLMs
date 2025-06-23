@@ -1,0 +1,8 @@
+# automation/config.py
+
+# IMPORTANT:
+# 1. Paste your API key here.
+# 2. DO NOT commit this file with the real key to a public repository.
+#    If using git, you should add "automation/config.py" to your .gitignore file.
+
+API_KEY = "YOUR_GEMINI_API_KEY_HERE"
