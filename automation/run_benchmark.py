@@ -1,6 +1,7 @@
 # automation/run_benchmark.py
 
 import google.generativeai as genai
+from google.api_core import exceptions as google_exceptions # Import Google API exceptions
 import os
 import json
 from datetime import datetime
@@ -119,26 +120,28 @@ def run_enigma_benchmark(model):
             response = model.generate_content(prompt)
             results[prompt] = response.text
             api_calls_successful += 1
+        except google_exceptions.ResourceExhausted as e:
+            error_message = f"API Error: Quota Exceeded (429) - {e.message}"
+            print(f"DEBUG: Caught ResourceExhausted in {benchmark_name}: {e.message}")
+            results[prompt] = error_message
+            api_calls_failed_quota += 1
+            quota_error_hit = True
+        except google_exceptions.GoogleAPIError as e:
+            error_message = f"API Error: {type(e).__name__} - {e.message}"
+            print(f"DEBUG: Caught GoogleAPIError in {benchmark_name}: {type(e).__name__} - {e.message}")
+            results[prompt] = error_message
+            api_calls_failed_other += 1
         except Exception as e:
-            error_message = str(e)
-            print(f"DEBUG: Caught Exception Type in {benchmark_name}: {type(e)}")
-            print(f"DEBUG run_{benchmark_name.lower()}_benchmark: RAW ERROR MSG: {error_message}")
-            results[prompt] = f"ERROR: {error_message}"
-            is_quota_error_flag_local = False
-            if "429" in error_message and ("quota" in error_message.lower() or "rate limit" in error_message.lower() or "resource has been exhausted" in error_message.lower()):
-                is_quota_error_flag_local = True
-            print(f"DEBUG run_{benchmark_name.lower()}_benchmark: is_quota_error_flag_local = {is_quota_error_flag_local}")
-            if is_quota_error_flag_local:
-                api_calls_failed_quota += 1
-                quota_error_hit = True
-                print(f"DEBUG run_{benchmark_name.lower()}_benchmark: quota_error_hit SET TO TRUE")
-            else:
-                api_calls_failed_other += 1
-        if SECONDS_BETWEEN_API_CALLS > 0: 
+            error_message = f"Non-API Error: {type(e).__name__} - {str(e)}"
+            print(f"DEBUG: Caught generic Exception in {benchmark_name}: {type(e).__name__} - {str(e)}")
+            results[prompt] = error_message
+            api_calls_failed_other += 1 # Or a new counter for non-API errors if desired
+
+        if SECONDS_BETWEEN_API_CALLS > 0 and not quota_error_hit: # No need to sleep if we are about to break
             time.sleep(SECONDS_BETWEEN_API_CALLS)
-        print(f"DEBUG run_{benchmark_name.lower()}_benchmark: Just before break check: quota_error_hit = {quota_error_hit}")
+
         if quota_error_hit:
-            print(f"INFO: API Quota Exceeded in {benchmark_name} benchmark. Skipping remaining prompts.")
+            print(f"INFO: API Quota Exceeded in {benchmark_name} benchmark. Skipping remaining prompts for this benchmark.")
             break
     return results
 
@@ -161,26 +164,28 @@ def run_visual_benchmark(model):
             response = model.generate_content([data['prompt'], img])
             results[prompt_key] = response.text
             api_calls_successful += 1
+        except google_exceptions.ResourceExhausted as e:
+            error_message = f"API Error: Quota Exceeded (429) - {e.message}"
+            print(f"DEBUG: Caught ResourceExhausted in {benchmark_name}: {e.message}")
+            results[prompt_key] = error_message
+            api_calls_failed_quota += 1
+            quota_error_hit = True
+        except google_exceptions.GoogleAPIError as e:
+            error_message = f"API Error: {type(e).__name__} - {e.message}"
+            print(f"DEBUG: Caught GoogleAPIError in {benchmark_name}: {type(e).__name__} - {e.message}")
+            results[prompt_key] = error_message
+            api_calls_failed_other += 1
         except Exception as e:
-            error_message = str(e)
-            print(f"DEBUG: Caught Exception Type in {benchmark_name}: {type(e)}")
-            print(f"DEBUG run_{benchmark_name.lower()}_benchmark: RAW ERROR MSG: {error_message}")
-            results[prompt_key] = f"ERROR: {error_message}"
-            is_quota_error_flag_local = False
-            if "429" in error_message and ("quota" in error_message.lower() or "rate limit" in error_message.lower() or "resource has been exhausted" in error_message.lower()):
-                is_quota_error_flag_local = True
-            print(f"DEBUG run_{benchmark_name.lower()}_benchmark: is_quota_error_flag_local = {is_quota_error_flag_local}")
-            if is_quota_error_flag_local:
-                api_calls_failed_quota += 1
-                quota_error_hit = True
-                print(f"DEBUG run_{benchmark_name.lower()}_benchmark: quota_error_hit SET TO TRUE")
-            else:
-                api_calls_failed_other += 1
-        if SECONDS_BETWEEN_API_CALLS > 0: 
+            error_message = f"Non-API Error: {type(e).__name__} - {str(e)}"
+            print(f"DEBUG: Caught generic Exception in {benchmark_name}: {type(e).__name__} - {str(e)}")
+            results[prompt_key] = error_message
+            api_calls_failed_other += 1
+
+        if SECONDS_BETWEEN_API_CALLS > 0 and not quota_error_hit: # No need to sleep if we are about to break
             time.sleep(SECONDS_BETWEEN_API_CALLS)
-        print(f"DEBUG run_{benchmark_name.lower()}_benchmark: Just before break check: quota_error_hit = {quota_error_hit}")
+
         if quota_error_hit:
-            print(f"INFO: API Quota Exceeded in {benchmark_name} benchmark. Skipping remaining prompts.")
+            print(f"INFO: API Quota Exceeded in {benchmark_name} benchmark. Skipping remaining prompts for this benchmark.")
             break
     return results
 
@@ -201,26 +206,28 @@ def run_lipogram_benchmark(model):
             response = model.generate_content(prompt)
             results[prompt] = response.text
             api_calls_successful += 1
+        except google_exceptions.ResourceExhausted as e:
+            error_message = f"API Error: Quota Exceeded (429) - {e.message}"
+            print(f"DEBUG: Caught ResourceExhausted in {benchmark_name}: {e.message}")
+            results[prompt] = error_message
+            api_calls_failed_quota += 1
+            quota_error_hit = True
+        except google_exceptions.GoogleAPIError as e:
+            error_message = f"API Error: {type(e).__name__} - {e.message}"
+            print(f"DEBUG: Caught GoogleAPIError in {benchmark_name}: {type(e).__name__} - {e.message}")
+            results[prompt] = error_message
+            api_calls_failed_other += 1
         except Exception as e:
-            error_message = str(e)
-            print(f"DEBUG: Caught Exception Type in {benchmark_name}: {type(e)}")
-            print(f"DEBUG run_{benchmark_name.lower()}_benchmark: RAW ERROR MSG: {error_message}")
-            results[prompt] = f"ERROR: {error_message}"
-            is_quota_error_flag_local = False
-            if "429" in error_message and ("quota" in error_message.lower() or "rate limit" in error_message.lower() or "resource has been exhausted" in error_message.lower()):
-                is_quota_error_flag_local = True
-            print(f"DEBUG run_{benchmark_name.lower()}_benchmark: is_quota_error_flag_local = {is_quota_error_flag_local}")
-            if is_quota_error_flag_local:
-                api_calls_failed_quota += 1
-                quota_error_hit = True
-                print(f"DEBUG run_{benchmark_name.lower()}_benchmark: quota_error_hit SET TO TRUE")
-            else:
-                api_calls_failed_other += 1
-        if SECONDS_BETWEEN_API_CALLS > 0: 
+            error_message = f"Non-API Error: {type(e).__name__} - {str(e)}"
+            print(f"DEBUG: Caught generic Exception in {benchmark_name}: {type(e).__name__} - {str(e)}")
+            results[prompt] = error_message
+            api_calls_failed_other += 1
+
+        if SECONDS_BETWEEN_API_CALLS > 0 and not quota_error_hit: # No need to sleep if we are about to break
             time.sleep(SECONDS_BETWEEN_API_CALLS)
-        print(f"DEBUG run_{benchmark_name.lower()}_benchmark: Just before break check: quota_error_hit = {quota_error_hit}")
+
         if quota_error_hit:
-            print(f"INFO: API Quota Exceeded in {benchmark_name} benchmark. Skipping remaining prompts.")
+            print(f"INFO: API Quota Exceeded in {benchmark_name} benchmark. Skipping remaining prompts for this benchmark.")
             break
     return results
 
