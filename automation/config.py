@@ -7,3 +7,7 @@
 
 API_KEY = "YOUR_GEMINI_API_KEY_HERE"
 IMAGE_API_KEY = "YOUR_IMAGE_API_KEY_HERE" # Placeholder for image generation model
+
+# Delay in seconds between consecutive API calls to the Gemini API.
+# Helps in managing rate limits. Set to 0 for no delay.
+SECONDS_BETWEEN_API_CALLS = 1
