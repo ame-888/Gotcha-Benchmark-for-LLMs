@@ -29,6 +29,8 @@ This project is divided into three distinct tests:
 
 *   [Gemini 2.0 / 2.5 Pro & Flash (Initial Test)](./RESULTS/gemini_scores.md)
 
+For a comprehensive overview of model performances, please see the [**Leaderboard**](./LEADERBOARD.md).
+
 ---
 
 ## Automated Benchmark Script
