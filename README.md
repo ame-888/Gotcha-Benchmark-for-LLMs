@@ -1,5 +1,11 @@
 # Gotcha-Benchmark-for-LLMs
 
+## 🏆 Leaderboard 🏆
+
+**For a comprehensive overview of model performances, please see the [Current Leaderboard](./LEADERBOARD.md).**
+
+---
+
 A benchmark for testing LLM reasoning in image generation (CLOCK), lateral thinking (ENIGMA), restricted text generation (LIPOGRAM) and visual analysis (VISUAL).
 
 ## Our Philosophy: Benchmark by Template
@@ -25,13 +31,7 @@ This project is divided into four distinct tests:
 1.  **Select a model** you wish to test.
 2.  **Run the prompts** from each of the four benchmark sections (`CLOCK`, `ENIGMA`, `VISUAL`, `LIPOGRAM`).
 3.  **Score the results** honestly based on the provided scoring criteria for each section.
-4.  **Share your findings!** You can submit your results by creating an "Issue" or a "Pull Request" with a new results file in the `/RESULTS` directory.
-
-## Current Results
-
-*   [Gemini 2.0 / 2.5 Pro & Flash (Initial Test)](./RESULTS/gemini_scores.md)
-
-For a comprehensive overview of model performances, please see the [**Leaderboard**](./LEADERBOARD.md).
+2.  **Share your findings!** You can submit your results by creating an "Issue" or a "Pull Request" with a new results file in the `/RESULTS` directory. You can then update the main [Leaderboard](./LEADERBOARD.md).
 
 ---
 
