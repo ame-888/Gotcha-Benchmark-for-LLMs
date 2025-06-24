@@ -4,4 +4,4 @@
 
 | Model | CLOCK Score | ENIGMA Score | VISUAL Score | LIPOGRAM Score | Total Score | Benchmark Version |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| gemini-1.5-flash-latest | 0 | 0 | 0 | 0 | 0 | N/A |
+| gemini-1.5-flash-latest | EXCLUDED | 0 | 0 | 0 | 0 | N/A |

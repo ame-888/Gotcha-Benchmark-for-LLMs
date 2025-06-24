@@ -241,15 +241,15 @@ def run_relogio_benchmark():
     for i, prompt in enumerate(prompts):
         print(f"  Processing CLOCK prompt {i+1}/{len(prompts)} (Conceptual): {prompt[:70]}...")
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        image_filename = f"conceptual_clock_prompt_{i+1}_{timestamp}.png"
-        saved_image_path = os.path.join(CLOCK_IMAGES_DIR, image_filename)
+        # image_filename = f"conceptual_clock_prompt_{i+1}_{timestamp}.png" # No longer creating placeholder paths
+        # saved_image_path = os.path.join(CLOCK_IMAGES_DIR, image_filename)
         results[prompt] = {
-            "status": "CONCEPTUAL: Image generation not implemented. Requires a separate image generation API/service.",
-            "notes": "This script does not perform image generation. The CLOCK test prompts are listed, but no images are created with the current Gemini API setup.",
-            "intended_example_output_path": saved_image_path
+            "status": "EXCLUDED - Script does not implement image generation",
+            "notes": "This script does not currently call an image generation API for the CLOCK test. Prompts are listed for potential manual use or future script enhancement.",
+            # "intended_example_output_path": saved_image_path # Not relevant if not generating
         }
-    print("  --> CLOCK benchmark is conceptual and does not generate images with the current setup.")
-    print("      To implement image generation, integrate a dedicated service like Imagen or DALL-E.")
+    print("  --> CLOCK benchmark: Image generation is not implemented in this script.")
+    print("      Results for CLOCK prompts are marked as 'EXCLUDED'.")
     return results
 
 if __name__ == "__main__":
