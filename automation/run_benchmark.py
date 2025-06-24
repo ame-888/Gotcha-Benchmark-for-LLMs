@@ -20,10 +20,15 @@ except ImportError:
 # Configure APIs
 if GEMINI_API_KEY and GEMINI_API_KEY != "YOUR_GEMINI_API_KEY_HERE":
     genai.configure(api_key=GEMINI_API_KEY)
-if OPENAI_API_KEY and OPENAI_API_KEY != "YOUR_OPENAI_API_KEY_HERE":
-    openai.api_key = OPENAI_API_KEY
+# Note: openai.api_key is deprecated for openai >= 1.0.
+# Client instances are now created with the API key.
+# if OPENAI_API_KEY and OPENAI_API_KEY != "YOUR_OPENAI_API_KEY_HERE":
+#     openai.api_key = OPENAI_API_KEY # This line will be removed
 
 # TODO: Add configuration for Imagen API if it's different and requires initialization
+
+# --- DEFAULT SETTINGS ---
+DEFAULT_IMAGE_GENERATION_SIZE = "1024x1024" # Default size for DALL-E, etc.
 
 # --- FILE & DIRECTORY PATHS ---
 ROOT_DIR = os.path.join(os.path.dirname(__file__), '..')
@@ -54,8 +59,8 @@ if OPENAI_API_KEY and OPENAI_API_KEY != "YOUR_OPENAI_API_KEY_HERE":
     MODELS_TO_BENCHMARK.extend([
         {"name": "gpt-4", "type": "text", "provider": "openai"}, # Example OpenAI text model
         {"name": "gpt-3.5-turbo", "type": "text", "provider": "openai"},
-        {"name": "dall-e-3", "type": "image_generation", "provider": "openai"}, # DALL-E for image generation
-        {"name": "dall-e-2", "type": "image_generation", "provider": "openai"},
+        {"name": "dall-e-3", "type": "image_generation", "provider": "openai"}, # DALL-E for image generation (defaults to 1024x1024)
+        {"name": "dall-e-2", "type": "image_generation", "provider": "openai", "image_params": {"size": "512x512"}}, # Example specific size
         # Add other OpenAI models as needed
     ])
 
@@ -72,6 +77,7 @@ api_calls_total = 0
 api_calls_successful = 0
 api_calls_failed_quota = 0
 api_calls_failed_other = 0
+api_calls_pending_implementation = 0 # New counter
 
 # --- PARSING FUNCTIONS ---
 def parse_md_file(file_path):
@@ -138,18 +144,18 @@ def parse_visual_prompts(file_path):
     return prompts
 
 # --- BENCHMARK EXECUTION FUNCTIONS ---
-def run_enigma_benchmark(model_info, client):
+def run_enigma_benchmark(model_info, client, prompts_list):
     benchmark_name = "ENIGMA"
     model_name = model_info['name']
     model_type = model_info['type']
     provider = model_info['provider']
 
     print(f"\n--- Running {benchmark_name} Benchmark for {model_name} ({provider}) ---")
-    prompts = parse_md_file(ENIGMA_PROMPTS_PATH)
+    # Prompts are now passed as an argument: prompts_list
     results = {}
 
-    if not prompts:
-        print(f"DEBUG run_enigma_benchmark: No prompts returned. Skipping {benchmark_name} for {model_name}.")
+    if not prompts_list:
+        print(f"DEBUG run_enigma_benchmark: No prompts provided. Skipping {benchmark_name} for {model_name}.")
         return results
 
     if model_type == "image_generation":
@@ -226,26 +232,27 @@ def run_enigma_benchmark(model_info, client):
             break
     return results
 
-def run_visual_benchmark(model_info, client):
+def run_visual_benchmark(model_info, client, visual_prompts_data): # Argument changed
     benchmark_name = "VISUAL"
     model_name = model_info['name']
     model_type = model_info['type']
     provider = model_info['provider']
 
     print(f"\n--- Running {benchmark_name} Benchmark for {model_name} ({provider}) ---")
-    prompts_data = parse_visual_prompts(VISUAL_PROMPTS_PATH)
+    # Prompts_data is now passed as an argument: visual_prompts_data
     results = {}
 
-    if not prompts_data:
-        print(f"DEBUG run_visual_benchmark: No prompts data. Skipping {benchmark_name} for {model_name}.")
+    if not visual_prompts_data: # Check the passed argument
+        print(f"DEBUG run_visual_benchmark: No visual prompts data provided. Skipping {benchmark_name} for {model_name}.")
         return results
 
-    if model_type == "text" and provider != "openai": # Assuming standard text models don't do vision unless specified (e.g. future multimodal gpt-4)
-        # This condition might need refinement based on actual OpenAI model capabilities for vision
-        print(f"INFO: {model_name} is a text-only model not designated for vision tasks. Skipping {benchmark_name}.")
+    # If a model is purely 'text', it's excluded from visual tasks.
+    # Multimodal models should have type 'vision'.
+    if model_type == "text":
+        print(f"INFO: {model_name} is a text-only model. Skipping {benchmark_name} (visual understanding task).")
         for data in prompts_data:
             prompt_key = f"{data['prompt']} [{os.path.basename(data['image_path'])}]"
-            results[prompt_key] = "EXCLUDED - Model is text-only"
+            results[prompt_key] = "EXCLUDED - Model is text-only, not suited for visual understanding"
         return results
     elif model_type == "image_generation":
         print(f"INFO: {model_name} is an image generation model. Skipping {benchmark_name} (vision understanding).")
@@ -292,7 +299,8 @@ def run_visual_benchmark(model_info, client):
                 # )
                 # response_text = response.choices[0].message.content
                 results[prompt_key] = "PENDING_IMPLEMENTATION - OpenAI vision model call not fully implemented"
-                api_calls_failed_other += 1 # Count as other failure for now
+                global api_calls_pending_implementation
+                api_calls_pending_implementation += 1
                 continue # Skip actual call until implemented
             else:
                 results[prompt_key] = f"ERROR: Provider '{provider}' or model type '{model_type}' not supported for {benchmark_name}"
@@ -345,30 +353,30 @@ def run_visual_benchmark(model_info, client):
             break
     return results
 
-def run_lipogram_benchmark(model_info, client):
+def run_lipogram_benchmark(model_info, client, prompts_list):
     benchmark_name = "LIPOGRAM"
     model_name = model_info['name']
     model_type = model_info['type']
     provider = model_info['provider']
 
     print(f"\n--- Running {benchmark_name} Benchmark for {model_name} ({provider}) ---")
-    prompts = parse_md_file(LIPOGRAM_PROMPTS_PATH)
+    # Prompts are now passed as an argument: prompts_list
     results = {}
 
-    if not prompts:
-        print(f"DEBUG run_lipogram_benchmark: No prompts. Skipping {benchmark_name} for {model_name}.")
+    if not prompts_list:
+        print(f"DEBUG run_lipogram_benchmark: No prompts provided. Skipping {benchmark_name} for {model_name}.")
         return results
 
     if model_type == "image_generation":
         print(f"INFO: {model_name} is an image generation model. Skipping {benchmark_name} text benchmark.")
-        for prompt in prompts:
+        for prompt in prompts_list: # Iterate over prompts_list
             results[prompt] = "EXCLUDED - Model is for image generation"
         return results
 
     # Potentially add exclusion for 'vision' if it's strictly vision and not text too.
     # For now, assuming 'vision' models like Gemini 1.5 Flash can also handle text.
 
-    for i, prompt in enumerate(prompts):
+    for i, prompt in enumerate(prompts_list): # Iterate over prompts_list
         print(f"  Processing {benchmark_name} prompt {i+1}/{len(prompts)} for {model_name}: {prompt[:70]}...")
         global api_calls_total, api_calls_successful, api_calls_failed_quota, api_calls_failed_other
         api_calls_total += 1
@@ -432,44 +440,44 @@ def run_lipogram_benchmark(model_info, client):
             break
     return results
 
-def run_relogio_benchmark(model_info, client): # Changed from run_relogio_benchmark()
+def run_relogio_benchmark(model_info, client, clock_prompts_list): # Argument changed
     benchmark_name = "CLOCK"
     model_name = model_info['name']
     model_type = model_info['type']
     provider = model_info['provider']
 
     print(f"\n--- Running {benchmark_name} Benchmark for {model_name} ({provider}) ---")
-    prompts = parse_md_file(CLOCK_PROMPTS_PATH)
+    # Prompts are now passed as an argument: clock_prompts_list
     results = {}
 
-    if not prompts:
-        print(f"DEBUG run_relogio_benchmark: No prompts for CLOCK. Skipping for {model_name}.")
+    if not clock_prompts_list: # Check the passed argument
+        print(f"DEBUG run_relogio_benchmark: No CLOCK prompts provided. Skipping for {model_name}.")
         return results
 
-    if model_type not in ["image_generation", "vision"]: # Allow vision models if they can generate images, e.g. Gemini 1.5 Flash
-        print(f"INFO: {model_name} (type: {model_type}) is not an image generation or suitable vision model. Skipping {benchmark_name}.")
+    # Check if the model is suitable for image generation
+    is_image_generation_model = model_type == "image_generation"
+    can_generate_images_flag = model_info.get("can_generate_images", False)
+
+    if not (is_image_generation_model or can_generate_images_flag):
+        print(f"INFO: {model_name} (type: {model_type}, can_generate_images: {can_generate_images_flag}) "
+              f"is not configured for image generation. Skipping {benchmark_name}.")
         for prompt in prompts:
             results[prompt] = {
-                "status": f"EXCLUDED - Model type '{model_type}' not suitable for image generation",
-                "notes": "",
+                "status": f"EXCLUDED - Model not configured for image generation",
+                "notes": f"Type: {model_type}, Can Generate Images Flag: {can_generate_images_flag}",
                 "image_path": ""
             }
         return results
 
-    # Specific check for Gemini vision models if they can generate images.
-    # The current `gemini-1.5-flash-latest` in this script is used for vision understanding, not generation.
-    # If a specific Gemini model *can* generate images, its 'type' should reflect that,
-    # or we need a more nuanced capability check.
-    if provider == "google" and model_type == "vision" and model_name == "gemini-1.5-flash-latest": # Example specific exclusion
-        print(f"INFO: {model_name} is primarily a vision understanding model. Image generation for it is not implemented/supported here. Skipping {benchmark_name}.")
-        for prompt in prompts:
-             results[prompt] = {
-                "status": "EXCLUDED - Gemini 1.5 Flash (as vision model) image generation not implemented here",
-                "notes": "This model is used for visual understanding in this script.",
-                "image_path": ""
-            }
-        return results
-
+    # Specific exclusion for gemini-1.5-flash-latest if it's primarily for vision understanding,
+    # even if it were to have can_generate_images = True, one might want to override.
+    # For now, the general check above should suffice if its `can_generate_images` is False or not set.
+    # If gemini-1.5-flash-latest had `can_generate_images: True` but we still wanted to exclude it here,
+    # a more specific check would be needed. The current code has a specific check for it as a vision model.
+    # Let's simplify: if can_generate_images is explicitly set, it should be honored unless a specific override exists.
+    # The previous specific exclusion for gemini-1.5-flash-latest (lines 485-494 in old code) will be removed
+    # in favor of relying on `model_info`'s `can_generate_images` flag.
+    # If 'gemini-1.5-flash-latest' is type 'vision' and 'can_generate_images' is false/unset, it will be excluded by the check above.
 
     for i, prompt_text in enumerate(prompts):
         print(f"  Processing {benchmark_name} prompt {i+1}/{len(prompts)} for {model_name}: {prompt_text[:70]}...")
@@ -483,11 +491,14 @@ def run_relogio_benchmark(model_info, client): # Changed from run_relogio_benchm
         try:
             if provider == "openai" and model_type == "image_generation": # DALL-E
                 # Ensure client is OpenAI client
+                image_params = model_info.get("image_params", {})
+                image_size = image_params.get("size", DEFAULT_IMAGE_GENERATION_SIZE)
+
                 response = client.images.generate(
                     model=model_name, # e.g., "dall-e-3"
                     prompt=prompt_text,
                     n=1,
-                    size="1024x1024" # Or other supported sizes
+                    size=image_size
                 )
                 image_url = response.data[0].url
                 # Optional: Download the image and save locally
@@ -500,16 +511,21 @@ def run_relogio_benchmark(model_info, client): # Changed from run_relogio_benchm
                 status_message = "PENDING_IMPLEMENTATION - Imagen call not implemented"
                 error_notes = "Imagen API call needs to be added."
                 print(f"    SKIPPING Imagen call for {prompt_text[:30]}... (not implemented)")
-                # For now, mark as other failure or a specific "not implemented" counter
-                # api_calls_failed_other += 1 # Or don't count it if it's known pending
+                global api_calls_pending_implementation
+                api_calls_pending_implementation +=1
             # Add Gemini image generation here if a model supports it (e.g. Gemini 2.0 Flash with image gen)
-            # elif provider == "google" and model_info.get("can_generate_images", False):
+            # elif provider == "google" and model_info.get("can_generate_images", False): # Ensure this key exists in model_info
             #     # Call Gemini image generation API
             #     status_message = "PENDING_IMPLEMENTATION - Gemini Image Gen not implemented"
             #     error_notes = "Gemini image generation API call needs to be added."
+            #     global api_calls_pending_implementation
+            #     api_calls_pending_implementation +=1
             else:
                 status_message = f"EXCLUDED - Provider '{provider}' or model '{model_name}' not configured for image generation in this script."
                 error_notes = f"Model type is '{model_type}'."
+                # This is an exclusion, not a pending item or failure in the usual sense.
+                # It might not need to increment api_calls_failed_other unless it's unexpected.
+                # For now, let's assume it's an expected exclusion.
 
             if image_path_or_url: # Successfully generated
                  # Create a filename for the image (even if it's a URL, for consistency in reporting)
@@ -561,6 +577,15 @@ def run_relogio_benchmark(model_info, client): # Changed from run_relogio_benchm
 
 if __name__ == "__main__":
     print("Initializing Benchmark Automation Script...")
+
+    # Pre-parse all prompt files
+    print("Parsing prompt files...")
+    enigma_prompts_list = parse_md_file(ENIGMA_PROMPTS_PATH)
+    visual_prompts_data_list = parse_visual_prompts(VISUAL_PROMPTS_PATH)
+    lipogram_prompts_list = parse_md_file(LIPOGRAM_PROMPTS_PATH)
+    clock_prompts_list = parse_md_file(CLOCK_PROMPTS_PATH)
+    print("Prompt files parsed.")
+
     # Initialize clients for each provider based on MODELS_TO_BENCHMARK
     clients = {}
     if GEMINI_API_KEY and GEMINI_API_KEY != "YOUR_GEMINI_API_KEY_HERE":
@@ -618,11 +643,11 @@ if __name__ == "__main__":
 
         # Run benchmarks based on model type
         if model_type in ["text", "vision"]:
-            current_model_results["enigma_results"] = run_enigma_benchmark(model_info, client_instance)
-            current_model_results["lipogram_results"] = run_lipogram_benchmark(model_info, client_instance)
+            current_model_results["enigma_results"] = run_enigma_benchmark(model_info, client_instance, enigma_prompts_list)
+            current_model_results["lipogram_results"] = run_lipogram_benchmark(model_info, client_instance, lipogram_prompts_list)
 
         if model_type == "vision":
-            current_model_results["visual_results"] = run_visual_benchmark(model_info, client_instance)
+            current_model_results["visual_results"] = run_visual_benchmark(model_info, client_instance, visual_prompts_data_list)
             # Potentially, vision models could also do image generation (e.g. Gemini 2.0 with image gen)
             # This logic might need to be more granular if a model is both "vision" and "image_generation"
             if model_name == "gemini-1.5-flash-latest": # Example: if this specific model can also do image gen
@@ -633,16 +658,16 @@ if __name__ == "__main__":
 
 
         if model_type == "image_generation":
-            current_model_results["relogio_results"] = run_relogio_benchmark(model_info, client_instance)
+            current_model_results["relogio_results"] = run_relogio_benchmark(model_info, client_instance, clock_prompts_list)
             # Image generation models typically don't do text or vision understanding benchmarks
             # The benchmark functions themselves handle the "EXCLUDED" part.
-            # To be explicit here, you could ensure other results are empty or marked.
+            # To be explicit here, you could ensure other results are empty or marked using the pre-parsed prompt lists.
             if not current_model_results["enigma_results"]: # if not already run and excluded by type
-                current_model_results["enigma_results"] = {p: "EXCLUDED - Model is for image generation" for p in parse_md_file(ENIGMA_PROMPTS_PATH)}
+                current_model_results["enigma_results"] = {p: "EXCLUDED - Model is for image generation" for p in enigma_prompts_list}
             if not current_model_results["lipogram_results"]:
-                current_model_results["lipogram_results"] = {p: "EXCLUDED - Model is for image generation" for p in parse_md_file(LIPOGRAM_PROMPTS_PATH)}
+                current_model_results["lipogram_results"] = {p: "EXCLUDED - Model is for image generation" for p in lipogram_prompts_list}
             if not current_model_results["visual_results"]:
-                 current_model_results["visual_results"] = {f"{data['prompt']} [{os.path.basename(data['image_path'])}]": "EXCLUDED - Model is for image generation" for data in parse_visual_prompts(VISUAL_PROMPTS_PATH)}
+                 current_model_results["visual_results"] = {f"{data['prompt']} [{os.path.basename(data['image_path'])}]": "EXCLUDED - Model is for image generation" for data in visual_prompts_data_list}
 
 
         all_benchmark_results[model_name] = current_model_results
@@ -685,4 +710,5 @@ if __name__ == "__main__":
     print(f"Successful API Calls: {api_calls_successful}")
     print(f"Failed API Calls (Quota): {api_calls_failed_quota}")
     print(f"Failed API Calls (Other): {api_calls_failed_other}")
+    print(f"API Calls Pending Implementation: {api_calls_pending_implementation}")
     print("-------------------------")
